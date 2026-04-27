@@ -1,0 +1,179 @@
+---
+title: Vercel로 배포하기
+---
+
+import { Callout } from 'nextra/components'
+
+# Vercel로 배포하기
+
+## 이 챕터의 목표
+
+본인 앱을 **인터넷에 띄웁니다**. 진짜 도메인이 생기고, 핸드폰으로도 접속할 수 있게 됩니다.
+
+작업 흐름은 다음과 같습니다.
+
+```
+Lovable → GitHub에 코드 푸시 (자동 또는 한 번 클릭)
+   ↓
+Vercel이 GitHub에서 코드를 가져옴
+   ↓
+Vercel에 환경 변수 등록 (Lovable에 등록한 것과 동일)
+   ↓
+배포 클릭 → 1~3분 → 인터넷 주소 발급 (xxx.vercel.app)
+```
+
+## 단계 1 — Lovable에서 GitHub 연결
+
+Lovable 우측 상단 또는 설정 메뉴에서 **GitHub 연결 / Export** 옵션이 있습니다.
+
+1. Lovable 프로젝트 우측 상단 → **GitHub** 아이콘 또는 **Connect to GitHub**
+2. GitHub 권한 승인
+3. **레포지토리 이름 입력** (예: `fitcheck-app`) → 생성
+4. Lovable이 자동으로 본인 GitHub 계정에 새 레포지토리를 만들고 코드를 푸시
+
+이제 본인 GitHub 계정에 가면 새 레포지토리가 보일 겁니다.
+
+<Callout type="info">
+**GitHub 레포지토리는 Public/Private 어느 쪽이든 됩니다.** 어차피 환경 변수(키)는 코드에 안 들어가 있으니, 강의 데모 단계에서는 Public이 편합니다. 실제 운영 시에는 Private 권장.
+</Callout>
+
+## 단계 2 — Vercel에 GitHub 레포 가져오기
+
+1. [https://vercel.com](https://vercel.com) 접속, 로그인
+2. 대시보드 → **"Add New..."** → **"Project"**
+3. **"Import Git Repository"** 섹션에 본인 레포지토리 목록이 보임
+4. 방금 만든 레포(예: `fitcheck-app`) 옆 **"Import"** 클릭
+
+레포가 안 보이면 **"Adjust GitHub App Permissions"** 클릭 → Vercel이 접근 가능한 레포에 본인 레포 추가.
+
+## 단계 3 — Vercel에 환경 변수 등록
+
+가장 중요한 단계입니다. **Lovable에 등록했던 것과 똑같은** 환경 변수를 Vercel에도 넣어야 합니다.
+
+Import 화면 중간에 **"Environment Variables"** 섹션이 있습니다.
+
+| Name | Value |
+| --- | --- |
+| `VITE_SUPABASE_URL` 또는 `NEXT_PUBLIC_SUPABASE_URL` | (Supabase Project URL) |
+| `VITE_SUPABASE_ANON_KEY` 또는 `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (Supabase anon key) |
+
+<Callout type="warning">
+**Lovable에서 사용한 환경 변수 이름과 정확히 같아야** 합니다. 한 글자라도 다르면 배포된 앱에서 Supabase 연결이 안 됩니다.
+
+확인 방법: Lovable 프로젝트 설정 화면의 환경 변수 이름을 그대로 복사 → Vercel에 같은 이름으로 등록.
+</Callout>
+
+## 단계 4 — Deploy 클릭
+
+환경 변수까지 입력했으면 화면 하단 **"Deploy"** 버튼 클릭.
+
+```
+빌드 중...
+   ↓ 1~3분
+배포 성공!
+   ↓
+URL 발급: https://fitcheck-app.vercel.app
+```
+
+URL이 나오면 클릭해서 본인 앱이 진짜로 떠 있는지 확인하세요.
+
+<Callout type="info">
+**핸드폰을 꺼내서 그 URL을 입력해 보세요.** 본인이 만든 앱이 핸드폰 화면에 떠 있는 모습은 강의에서 가장 인상 깊은 순간입니다. 사진 한 장 찍어 두세요.
+</Callout>
+
+## 단계 5 — 회원가입·CRUD가 진짜 도메인에서도 되는지 확인
+
+배포된 URL에서 다음을 한 번 더 시도하세요.
+
+- [ ] 회원가입 (Lovable에서 만든 계정과 별개로 새 계정 만들어 보기)
+- [ ] 로그인
+- [ ] 데이터 1건 입력 → 저장
+- [ ] 새로고침 후에도 그대로 보임
+- [ ] 로그아웃 → 다시 로그인 → 데이터가 그대로
+
+## 자동 재배포 — 코드를 바꾸면 자동으로 다시 띄움
+
+Vercel은 **GitHub에 새 커밋이 푸시될 때마다 자동으로 다시 배포**해 줍니다. 즉, Lovable에서 화면을 수정 → GitHub에 푸시 → Vercel이 자동으로 새 버전을 띄움.
+
+이걸 위해서 Lovable이 코드를 GitHub에 자동 푸시하게 설정되어 있어야 합니다 (Lovable의 GitHub 연결이 켜져 있다면 자동).
+
+## 흔한 에러 + 해결
+
+### 에러 1: 빌드 실패
+
+빌드 로그를 보면 빨간 줄로 에러 메시지가 보입니다.
+
+**자주 보이는 메시지**:
+
+| 메시지 | 원인 | 해결 |
+| --- | --- | --- |
+| `Module not found` | 패키지 누락 | Lovable에서 다시 GitHub로 푸시 |
+| `Environment variable ... is not defined` | 환경 변수 누락 | Vercel 환경 변수 다시 확인 |
+| `Type error` | 코드 타입 에러 | Lovable에 "타입 에러 고쳐 줘" 시키고 재푸시 |
+
+### 에러 2: 배포는 됐는데 화면이 빈 페이지
+
+**원인**: 환경 변수가 빠지거나 잘못됨
+
+**해결**:
+1. Vercel 프로젝트 → Settings → Environment Variables
+2. URL/KEY 확인
+3. 변경했다면 **Deployments → ... → Redeploy** 한 번 더
+
+### 에러 3: 회원가입은 되는데 데이터 저장 시 에러
+
+**원인**: Supabase RLS 정책이 안 들어가 있을 수 있음 (개발 시엔 됐는데 배포본에서 막힘)
+
+**해결**: Supabase Table Editor → 테이블 → Authentication 탭에서 정책 확인 → 빠진 정책 추가
+
+### 에러 4: CORS 에러 (빨간 글씨)
+
+**원인**: Supabase가 Vercel 도메인을 모름
+
+**해결**: Supabase 대시보드 → Authentication → URL Configuration → Site URL과 Redirect URL에 **Vercel 도메인** (예: `https://fitcheck-app.vercel.app`) 추가
+
+## Vercel URL 메모
+
+배포 성공 후 URL을 메모해 두세요. 이 URL은 다음과 같이 활용됩니다.
+
+- 친구·가족에게 공유 (Day 3 숙제)
+- Day 4 발표 자료
+- 본인 포트폴리오
+
+<Callout type="info">
+**Vercel 무료 도메인 형식**: `your-project-name.vercel.app`
+**팀 단위 무료**: 여러 사람과 공유하려면 **Hobby 플랜**(무료)에서 한 명만 owner.
+**커스텀 도메인 (.com)**: 도메인을 사면 [Day 4](/day4/landing-page)에서 연결합니다.
+</Callout>
+
+## 체크포인트
+
+- [ ] 본인 GitHub에 새 레포지토리 보임
+- [ ] Vercel 대시보드에 본인 프로젝트 보임
+- [ ] **배포 성공** (Vercel에서 초록색 체크)
+- [ ] `xxx.vercel.app` URL이 발급됨
+- [ ] 그 URL에 접속해 회원가입·로그인·데이터 저장이 다 됨
+- [ ] **핸드폰**에서도 접속해서 동작 확인
+- [ ] URL 메모 (Day 3 숙제·Day 4에서 사용)
+
+## 자주 묻는 질문
+
+### Q. "Vercel URL이 마음에 안 들어요"
+
+Vercel 프로젝트 설정 → **Domains** → 새 도메인 이름으로 변경 가능 (예: `my-fitcheck.vercel.app`). 아예 본인 .com 도메인을 연결하는 건 [Day 4](/day4/landing-page)에서 다룹니다.
+
+### Q. "이 사이트가 다운되면요?"
+
+Vercel과 Supabase는 **99.99% 가용성**을 보장합니다. 거의 안 다운됩니다. 다운된다면 그건 페이스북·인스타도 같이 다운되는 수준의 큰 사고입니다.
+
+### Q. "트래픽이 폭발하면 돈이 청구되나요?"
+
+무료 플랜에는 **월 100GB 트래픽** 제한이 있습니다. 일반적인 데모 앱이라면 사용자 수만 명이 와도 못 채웁니다. 한도 초과 전에 Vercel이 알림을 줍니다 → 그때 유료 플랜 검토.
+
+### Q. "더 많은 사람이 회원가입하면 어떻게 봐요?"
+
+Supabase 대시보드 → Authentication > Users에서 가입자 수가 보입니다. 무료 플랜은 **월 5만 명 활성 사용자**까지 가능합니다. 그 전에 유료 검토할 일은 거의 없습니다.
+
+## 다음 단계
+
+배포까지 끝났습니다. 정말 큰일을 하셨습니다. [Day 3 숙제](/day3/homework)로 마무리하세요.

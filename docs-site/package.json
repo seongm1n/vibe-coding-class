@@ -1,0 +1,24 @@
+{
+  "name": "vibe-coding-class-docs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "세종청년센터 — 바이브 코딩으로 수익나는 앱 만들기 강의 학습 자료",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^14.2.15",
+    "nextra": "^2.13.4",
+    "nextra-theme-docs": "^2.13.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.4.5"
+  }
+}

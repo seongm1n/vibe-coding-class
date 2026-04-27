@@ -1,0 +1,15 @@
+# Netlify 배포 설정
+# 이 파일이 GitHub에 푸시되면 Netlify가 자동으로 감지해 빌드/배포합니다.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Next.js를 Netlify에서 굴리기 위한 공식 플러그인.
+# 이 줄만 있으면 Netlify가 알아서 설치/설정합니다.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

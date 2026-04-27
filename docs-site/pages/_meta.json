@@ -1,0 +1,13 @@
+{
+  "index": "강의 소개",
+  "day1": "Day 1 — AI 도구 만물상",
+  "day2": "Day 2 — 앱 컨셉과 첫 화면",
+  "day3": "Day 3 — 데이터·인증·배포",
+  "day4": "Day 4 — 수익화와 발표",
+  "resources": {
+    "title": "도구·참고자료 모음",
+    "theme": {
+      "breadcrumb": false
+    }
+  }
+}
