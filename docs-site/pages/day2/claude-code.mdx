@@ -1,0 +1,639 @@
+---
+title: (심화) Claude Code 사용법
+---
+
+import { Callout } from 'nextra/components'
+
+# (심화) Claude Code 사용법
+
+<Callout type="warning">
+**이 챕터는 선택입니다.** 부담스러우면 [Day 2 숙제](/day2/homework)로 넘어가세요. **Day 3~4를 따라가는 데 이 챕터는 필수가 아닙니다.**
+
+다음 사람을 위한 챕터입니다.
+- 강의 진도가 빠르게 끝났고 시간이 남는 사람
+- Lovable 너머의 본격적인 도구가 궁금한 사람
+- "노코드는 한계가 보여요. 더 자유롭게 코드를 만지고 싶어요" 인 사람
+</Callout>
+
+## Claude Code가 뭔가요?
+
+**Claude Code = 본인 컴퓨터에서 동작하는 Claude 기반 코딩 어시스턴트**입니다. Anthropic(Claude를 만든 회사)에서 직접 만든 공식 CLI 도구입니다.
+
+```
+ChatGPT/Claude (웹)            Claude Code (본인 컴퓨터)
+─────────────────              ──────────────────────────
+브라우저에서 대화               터미널에서 대화
+파일은 복사·붙여넣기            파일을 직접 읽고 편집
+1회성 대화                      프로젝트 단위로 동작
+"이렇게 만들어 줘" 시키기       "이 폴더에서 해 줘" 시키기
+```
+
+Lovable이 "AI에게 화면을 만들어 달라고 시키는" 도구였다면, Claude Code는 **본인 컴퓨터의 코드를 직접 만지는** 도구입니다. 한 단계 더 깊습니다.
+
+## 우리 강의 흐름에서의 위치
+
+```
+Day 1: AI 도구 만물상 (체험)
+Day 2: Lovable로 앱 만들기 (노코드)
+Day 3: Supabase·Vercel·GitHub (백엔드 연결)
+Day 4: 수익화·발표
+
+  ───── (강의 끝) ─────
+
+Day 5+: Claude Code로 본격적인 코드 작업
+       ├─ Lovable 앱을 본인 컴퓨터로 git clone
+       ├─ 진짜 기능 추가
+       └─ 더 자유로운 수정
+```
+
+오늘 이 챕터는 **"앞으로 이런 게 있다"** 정도만 보여 드리는 자리입니다. 전부 외울 필요 없습니다.
+
+## 설치하기 (5분)
+
+### 1) Claude Code 설치
+
+```bash
+# macOS / Linux
+curl -fsSL https://claude.ai/install.sh | sh
+
+# Windows
+winget install anthropic.claude-code
+```
+
+설치 후 터미널에서 다음을 쳐서 버전이 뜨면 성공.
+
+```bash
+claude --version
+```
+
+### 2) 로그인
+
+```bash
+claude
+```
+
+처음 실행하면 로그인 창이 뜹니다. **무료 / Pro / Max 플랜** 중 하나로 로그인.
+
+<Callout type="info">
+**무료 플랜**으로도 시작 가능합니다. 본격적으로 쓸 거면 Pro 플랜(월 $20). 더 많이 쓰는 사람은 Max 플랜 또는 API 키 결제 방식.
+</Callout>
+
+## 핵심 개념 4가지
+
+Claude Code의 강력함은 다음 4가지 무기에서 나옵니다. 차례대로 봅니다.
+
+| 개념 | 한 줄 설명 |
+|------|-----------|
+| **CLAUDE.md** | 프로젝트 규칙서. Claude가 모든 대화에서 먼저 읽음 |
+| **Skills** | 자주 쓰는 작업을 슬래시 명령어로 등록 (예: `/commit`, `/pr`) |
+| **Hooks** | 특정 시점에 자동 실행되는 명령어 (예: 저장 시 prettier 자동) |
+| **Agents** | 특정 작업 전문 서브 에이전트 (planner, code-reviewer 등) |
+
+이 4가지를 묶어서 **하네스 엔지니어링** 이라고 부릅니다. 먼저 이 개념부터.
+
+## 1. 하네스 엔지니어링이란? (이 챕터의 핵심)
+
+> **프롬프트 엔지니어링** = 한 번의 대화에서 좋은 답을 얻는 기술
+> **하네스 엔지니어링** = 좋은 답이 **항상** 나오도록 환경을 미리 잡아두는 기술
+
+"하네스(harness)"는 안전벨트·작업복이라는 뜻입니다. 클라이밍에서 하네스를 매면 떨어져도 안전한 것처럼, AI 작업에 하네스를 입혀 두면 **결과 품질이 흔들리지 않습니다**.
+
+### 무엇을 입히나?
+
+본인 프로젝트 폴더 안에 다음 구조를 만들어 두는 게 하네스의 실체입니다.
+
+```
+프로젝트 폴더
+├── CLAUDE.md              ← 프로젝트 규칙
+├── .claude/
+│   ├── settings.json      ← Hooks 설정
+│   ├── skills/            ← 슬래시 명령어들
+│   │   ├── commit.md
+│   │   └── pr.md
+│   └── agents/            ← 전문 서브 에이전트
+│       ├── code-reviewer.md
+│       └── planner.md
+└── (실제 코드)
+```
+
+이걸 잡아두면 **다음에 누가 와서 같은 프로젝트를 열어도 동일한 결과**가 나옵니다. 회사라면 팀 공통 작업 환경이고, 개인이라면 본인 표준 작업 흐름입니다.
+
+### 비전공자에게 왜 중요한가?
+
+매번 "이렇게 해 줘, 저렇게 해 줘"를 반복할 필요가 없어집니다.
+
+> **한 번 잘 적어 두면 100번 자동으로 적용됩니다.**
+
+이게 프롬프트 엔지니어링과 가장 다른 점입니다.
+
+## 2. CLAUDE.md 작성법
+
+CLAUDE.md = 프로젝트 루트에 두는 **Claude 전용 README** 입니다. Claude Code가 매 대화에서 자동으로 읽습니다.
+
+### 구조 (예시)
+
+```markdown filename="CLAUDE.md"
+# 프로젝트 개요
+
+운동 기록 일기 앱. 헬스장 다니는 직장인 대상.
+React + Next.js + Supabase 사용.
+
+## 폴더 구조
+
+- `app/` — 페이지·라우팅
+- `components/` — 재사용 UI
+- `lib/supabase.ts` — DB 연결
+- `types/` — 타입 정의
+
+## 코딩 스타일
+
+- 함수형 컴포넌트만 사용 (class X)
+- 한 파일 200줄 넘으면 분할
+- 변수·함수 이름은 영어, 주석은 한국어
+- `any` 타입 금지, 명시적 타입 사용
+
+## 자주 쓰는 명령어
+
+- `npm run dev` — 개발 서버
+- `npm run build` — 빌드
+- `npm run typecheck` — 타입 검사
+
+## 절대 하지 말 것
+
+- `.env` 파일 커밋 금지
+- DB 비밀번호 코드에 하드코딩 금지
+- `console.log` 남기고 커밋 금지
+
+## 항상 할 것
+
+- 새 기능은 테스트 먼저 작성
+- 커밋 메시지는 한국어로
+- PR은 영어 제목, 한국어 본문
+```
+
+### 작성 원칙 5가지
+
+1. **200줄 이하** — 너무 길면 끝부분이 잘릴 수 있음
+2. **"왜"보다 "무엇을"** — Claude는 추론을 본인이 함. 명령만 적기
+3. **본인이 매번 반복하는 잔소리를 적기** — "또 console.log 남겼네!" 같은 거
+4. **금지 사항이 가장 효과 큼** — "X 하지 마" 한 줄이 결과 품질 가장 많이 끌어올림
+5. **자주 업데이트** — 새 패턴 발견할 때마다 한 줄씩 추가
+
+### 실전 팁 — `/init` 명령
+
+`claude` 실행 후 다음을 치세요.
+
+```
+/init
+```
+
+Claude가 본인 코드베이스를 읽고 **CLAUDE.md 초안을 자동으로 만들어 줍니다**. 그걸 본인 손으로 다듬으면 끝.
+
+<Callout type="info">
+**전역 CLAUDE.md** 도 있습니다. `~/.claude/CLAUDE.md` 또는 `~/.claude/rules/*.md`에 본인의 모든 프로젝트에 공통 적용할 규칙(코딩 스타일·git 워크플로 등)을 적어 둘 수 있습니다.
+</Callout>
+
+## 3. Skills 사용법
+
+자주 하는 작업을 **슬래시 명령어**로 등록합니다.
+
+### 예시 — 커밋 메시지 자동 생성
+
+`.claude/skills/commit.md` 파일을 만듭니다.
+
+```markdown filename=".claude/skills/commit.md"
+---
+description: 변경 사항을 분석해서 한국어 커밋 메시지를 만들어 커밋한다
+---
+
+다음 단계로 진행:
+
+1. `git status`로 변경 파일 확인
+2. `git diff`로 변경 내용 분석
+3. Conventional Commits 스타일로 한국어 커밋 메시지 작성
+   - feat / fix / refactor / docs 중 적절한 prefix
+   - 1줄 요약 (50자 이하)
+   - 본문은 "왜" 변경했는지 설명
+4. `git add` + `git commit` 실행
+
+커밋 메시지에 이슈 번호가 있으면 포함.
+```
+
+이제 터미널에서:
+
+```
+/commit
+```
+
+한 번 치면 위 흐름이 그대로 실행됩니다. **매번 같은 잔소리 반복할 필요가 없습니다.**
+
+### 자주 만드는 Skill 목록
+
+| 명령어 | 용도 |
+|--------|------|
+| `/commit` | 변경 분석 + 커밋 |
+| `/pr` | PR 본문 자동 생성 |
+| `/review` | 본인 코드 자체 리뷰 |
+| `/test` | 테스트 작성 + 실행 |
+| `/refactor` | 리팩토링 + 검증 |
+| `/issue` | GitHub 이슈 마크다운 자동 생성 |
+
+본인 작업 패턴에 맞게 만들면 됩니다. 강의 강사도 `/commit`, `/pr`, `/issue` 같은 본인 Skill을 매일 씁니다.
+
+### Skill 위치 2곳
+
+- `~/.claude/skills/` — 모든 프로젝트에서 쓰는 전역 Skill
+- `.claude/skills/` — 이 프로젝트 전용 Skill (예: 회사 코드 컨벤션 검사)
+
+## 4. Hooks 설정
+
+Hooks = **특정 시점에 자동으로 실행되는 명령어** 입니다.
+
+### 위치
+
+`~/.claude/settings.json` (전역) 또는 `.claude/settings.json` (프로젝트별).
+
+### 시점 3가지
+
+| Hook | 언제 실행 |
+|------|-----------|
+| **PreToolUse** | Claude가 도구를 쓰기 직전 (파일 수정 전 검사) |
+| **PostToolUse** | Claude가 도구를 쓴 직후 (파일 수정 후 prettier) |
+| **Stop** | 세션이 끝날 때 (최종 검사) |
+
+### 예시 — 파일 저장 후 자동 포맷·타입 검사
+
+```json filename="~/.claude/settings.json"
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "command": "prettier --write {{file}}"
+      },
+      {
+        "matcher": "Edit|Write",
+        "fileExtensions": [".ts", ".tsx"],
+        "command": "tsc --noEmit"
+      }
+    ],
+    "Stop": [
+      {
+        "command": "git status"
+      }
+    ]
+  }
+}
+```
+
+이걸 잡아두면:
+- TS 파일 수정할 때마다 자동으로 **타입 검사**
+- 모든 파일 수정 후 자동으로 **prettier 포맷**
+- 세션 종료 시 **git status로 빠뜨린 거 점검**
+
+**비전공자에게 핵심 효과**: 매번 "포맷 좀 정리해 줘", "타입 체크해 봐" 시킬 필요가 없습니다. 자동으로 됩니다.
+
+## 5. Agents 활용
+
+특정 영역에 특화된 **서브 에이전트** 를 만들어 둘 수 있습니다.
+
+### 기본 제공 에이전트
+
+| 에이전트 | 용도 | 추천 사용 시점 |
+|----------|------|----------------|
+| `planner` | 복잡한 기능 구현 계획 수립 | 새 기능 시작 전 |
+| `code-reviewer` | 코드 작성 후 즉시 리뷰 | 코드 짠 직후 |
+| `security-reviewer` | 보안 취약점 점검 | 인증·결제 코드 작성 후 |
+| `tdd-guide` | 테스트 먼저 작성 워크플로 | 새 기능·버그 수정 |
+| `build-error-resolver` | 빌드 에러 자동 해결 | 빌드 실패할 때 |
+| `e2e-runner` | E2E 테스트 작성·실행 | 핵심 사용자 흐름 검증 |
+
+### 사용법
+
+```
+@planner 새로운 결제 기능 추가 계획 짜 줘
+```
+
+`@`를 붙이면 해당 에이전트가 처리합니다. **메인 컨텍스트가 가벼워지고**, 전문 영역에 집중된 결과가 나옵니다.
+
+### 본인 에이전트 만들기
+
+`.claude/agents/my-reviewer.md`:
+
+```markdown filename=".claude/agents/my-reviewer.md"
+---
+description: 이 프로젝트 코딩 컨벤션에 맞는지 검토하는 리뷰어
+tools: Read, Grep, Bash
+---
+
+너는 이 프로젝트의 코드 리뷰어다.
+
+다음 기준으로만 검토:
+1. 함수형 컴포넌트인가
+2. 한 파일 200줄 이하인가
+3. any 타입 안 썼는가
+4. console.log 남아 있지 않은가
+5. 변수·함수 이름이 의미를 명확히 표현하는가
+
+각 항목마다 PASS/FAIL과 근거를 적어 줘.
+```
+
+## 6. MCP 서버 (한 줄만)
+
+**MCP (Model Context Protocol)** = Claude Code에 외부 도구 (DB, Slack, GitHub API, Google Drive 등) 를 연결하는 표준 프로토콜.
+
+이건 더 깊은 영역이라 오늘은 "이런 게 있다" 정도만 알아 두세요. 본인 강의가 끝난 후 [공식 문서](https://docs.claude.com/en/docs/claude-code/mcp) 참고.
+
+## 7. 실제로 쓰는 모습 — 7분 라이브 데모
+
+여기까지가 개념·도구 설명이었습니다. 이제 **실제로 코딩하는 모습**을 봅니다. 강사가 강의 중에 그대로 따라할 수 있는 7분짜리 시연 대본입니다.
+
+### 시나리오 — 운동 기록 앱에 다크모드 토글 추가
+
+**전제:** Lovable에서 만든 앱이 본인 컴퓨터에 git clone 되어 있고, Claude Code 설치·로그인 완료된 상태.
+
+#### 0분 — 시작 전 폴더 확인
+
+```bash
+cd ~/Desktop/fitcheck-app
+ls
+```
+
+폴더 안 파일들이 보임:
+
+```
+app/  components/  package.json  README.md  ...
+```
+
+#### 1분 — 현재 앱 상태 (Before)
+
+```bash
+npm run dev
+```
+
+브라우저에서 [http://localhost:3000](http://localhost:3000) → **흰 배경의 라이트 테마만** 있음. 우측 상단에 토글 버튼 없음.
+
+> 강사 멘트: "지금은 라이트 테마밖에 없어요. 다크모드를 추가해 봅시다. 보통 개발자가 손으로 짜면 30분~1시간 걸리는 작업이에요."
+
+#### 2분 — Claude Code 실행
+
+새 터미널 창을 같은 폴더에서 열고:
+
+```bash
+claude
+```
+
+화면이 이렇게 뜸:
+
+```
+╭─────────────────────────────────────────────╮
+│ ✻ Welcome to Claude Code                    │
+│                                             │
+│   /help for help, /status for status        │
+│                                             │
+│   cwd: ~/Desktop/fitcheck-app               │
+╰─────────────────────────────────────────────╯
+
+>
+```
+
+> 강사 멘트: "지금 이 폴더 안의 파일들을 Claude가 다 읽을 수 있어요. **무엇을 어떻게 고칠지는 본인이 판단합니다.**"
+
+#### 3분 — 첫 지시 한 줄
+
+`>` 옆에 다음을 한국어로 칩니다.
+
+```
+> 메인 화면 우측 상단에 다크모드 토글 버튼을 추가해 줘.
+  - 해/달 아이콘 (lucide-react 사용)
+  - 클릭하면 화면 전체가 다크모드로 전환
+  - 사용자 선택은 localStorage에 저장 (새로고침해도 유지)
+  - 색상은 배경 #0f0f0f, 텍스트 #eaeaea
+```
+
+#### 3~5분 — Claude가 작업하는 모습
+
+화면에 다음 흐름이 차례로 흐름:
+
+```
+● Read(app/page.tsx)
+  ⎿  ... (파일 내용 읽음)
+
+● Read(components/header.tsx)
+  ⎿  ...
+
+● Write(components/dark-mode-toggle.tsx)
+  ⎿  Created new file (32 lines)
+
+● Edit(components/header.tsx)
+  ⎿  Added DarkModeToggle import + button placement
+     + import { DarkModeToggle } from "./dark-mode-toggle"
+     + <DarkModeToggle />
+
+● Edit(app/layout.tsx)
+  ⎿  Wrapped <body> with ThemeProvider
+```
+
+> 강사 멘트: "보세요. **Claude가 알아서 어떤 파일을 읽고 어디를 고쳐야 할지 판단합니다.** 사람이 일일이 안내할 필요가 없어요. Lovable이 '시키는 대로 만든다'면 Claude Code는 '본인이 판단해서 만든다'에 가깝습니다."
+
+#### 5분 — 결과 확인 (After)
+
+브라우저로 돌아가서 새로고침. (Next.js는 자동 새로고침되는 경우가 많음)
+
+- 우측 상단에 ☀️ 아이콘 등장
+- 클릭 → 화면 전체가 검은 배경으로 전환, 아이콘이 🌙 으로 변함
+- 새로고침해도 다크모드 유지됨
+
+#### 6분 — 자연스러운 후속 질문
+
+```
+> 토글 애니메이션이 너무 딱딱해. 부드럽게 transition 추가해 줘. 200ms 정도.
+```
+
+Claude가 CSS transition을 자동으로 추가. 다시 새로고침. 부드럽게 전환됨.
+
+#### 7분 — Lovable과의 비교 정리
+
+| 비교 | Lovable | Claude Code |
+|------|---------|-------------|
+| 메시지 한도 | 하루 5개 전후 | 없음 (Pro 플랜 기준) |
+| 작업 단위 | UI 한 화면 | 코드 전체 어디든 |
+| 실행 위치 | 클라우드 | 본인 컴퓨터 |
+| 진입장벽 | 매우 낮음 | 약간 있음 (터미널 익숙해지기) |
+| 결과 위치 | Lovable 안에만 | 본인 코드, GitHub, 어디든 |
+
+> 강사 멘트: "Lovable은 **첫 화면 빠르게 만들 때** 강하고, Claude Code는 **그 다음 진짜 기능 추가할 때** 강합니다. 둘이 같이 쓰는 도구예요."
+
+## 8. 터미널 화면 — Claude는 실제로 이렇게 생겼다
+
+비전공자에게 "터미널이 무서워요"는 흔한 반응입니다. 실제 화면이 어떻게 생겼는지 미리 봅니다.
+
+### 진입 시
+
+```
+[~/Desktop/fitcheck-app] $ claude
+
+╭─────────────────────────────────────────────╮
+│ ✻ Welcome to Claude Code                    │
+│                                             │
+│   /help for help, /status for status        │
+│                                             │
+│   cwd: ~/Desktop/fitcheck-app               │
+╰─────────────────────────────────────────────╯
+
+>
+```
+
+`>` 가 입력 대기 표시. 여기에 한국어로 명령을 치면 됩니다.
+
+### 첫 대화 예시
+
+```
+> 안녕, 한국어로 자기소개 해 줘
+
+안녕하세요! 저는 Claude Code, Anthropic이 만든 코딩 어시스턴트입니다.
+지금 이 터미널에서 ~/Desktop/fitcheck-app 폴더의 코드를 읽고
+수정할 수 있어요.
+
+무엇을 도와드릴까요?
+
+>
+```
+
+### 파일을 직접 분석하는 예시
+
+```
+> 이 폴더에서 가장 긴 파일이 뭔지 알려줘
+
+● Bash(find . -name "*.tsx" -exec wc -l {} \; | sort -rn | head -5)
+  ⎿    347 ./app/dashboard/page.tsx
+       198 ./components/exercise-form.tsx
+       ...
+
+가장 긴 파일은 app/dashboard/page.tsx로 347줄입니다.
+한 파일이 너무 길어 분리하는 게 좋아 보입니다.
+3~4개의 작은 컴포넌트로 분리해 드릴까요?
+
+>
+```
+
+> **여기서 핵심**: 명령(`find ...`)을 사람이 친 게 아니라, **Claude가 본인이 알아서 명령을 결정해서 실행**한 다음 결과를 해석해 줍니다.
+
+### 종료
+
+```
+> /exit
+```
+
+또는 `Ctrl+C` 두 번.
+
+## 9. 본인이 5분 안에 해보는 첫 도전 (선택)
+
+강의 끝나고 집에서 **5분 안에** 첫 시도를 해 볼 수 있습니다.
+
+### 미션
+
+```bash
+# 1. 빈 폴더 만들기
+mkdir hello-claude
+cd hello-claude
+
+# 2. Claude Code 실행
+claude
+```
+
+`>` 표시가 나오면, 다음 두 가지를 차례로 칩니다.
+
+```
+> 한국어로 자기소개 해 줘
+```
+
+```
+> "안녕하세요" 라는 글자가 가운데 크게 나오는 HTML 페이지를 만들어 줘.
+  배경은 어두운 보라색, 글자는 흰색, 폰트는 큰 sans-serif.
+  파일명은 hello.html.
+```
+
+만들어진 파일 열어 보기:
+
+```bash
+# macOS
+open hello.html
+
+# Windows
+start hello.html
+```
+
+브라우저에서 본인이 시킨 대로 화면이 떠 있으면 **첫 시도 성공**입니다.
+
+<Callout type="info">
+**5분 안에 끝낼 수 있다면** 본인은 이미 Claude Code 사용 자격이 있습니다. 그 다음은 본인 Lovable 앱을 git clone 해서 진짜 기능을 추가하는 단계입니다.
+</Callout>
+
+### 막힐 때 — 자주 나오는 에러
+
+| 증상 | 해결 |
+|------|------|
+| `command not found: claude` | 설치가 안 됨 → 위 "설치하기" 섹션 다시 |
+| 로그인 화면이 안 뜸 | `claude logout` 후 `claude` 다시 |
+| macOS에서 권한 에러 | `xcode-select --install` 한 번 |
+| 응답이 너무 느림 | 무료 플랜 한도 도달일 수 있음. 잠시 후 재시도 |
+| 한국어가 깨져 보임 | 터미널 폰트 변경 (D2Coding, Pretendard Mono 등) |
+
+## 추천 학습 순서
+
+비전공자 기준으로 다음 순서가 가장 자연스럽습니다.
+
+```
+1주차: 그냥 claude 명령으로 대화하면서 익숙해지기
+       (브라우저에서 ChatGPT 쓰듯 터미널에서 claude 쓰기)
+
+2주차: CLAUDE.md 한 장 적기
+       (/init으로 시작 → 본인 손으로 다듬기)
+
+3주차: Skill 1개 만들어 보기
+       (/commit이 가장 쉬움)
+
+4주차: Hooks 1개 추가
+       (PostToolUse: prettier 자동 실행이 쉬움)
+
+5주차+: Agent, MCP 차례로
+```
+
+<Callout type="warning">
+**한 번에 다 하려고 하지 마세요.** 1주에 1개씩 늘려가면 5주차에는 본인만의 작업 환경이 잡혀 있습니다. **하네스는 한 번에 다 입히는 게 아니라 한 겹씩 쌓는 것입니다.**
+</Callout>
+
+## 우리 강의 이후의 흐름
+
+```
+Day 4까지: Lovable로 앱 1개 띄우기 + Vercel 배포
+   ↓
+숙제로: Claude Code 설치 + claude 한 번 실행
+   ↓
+1주 후: CLAUDE.md 첫 작성
+   ↓
+2주 후: Lovable로 만든 앱을 본인 컴퓨터로 git clone
+        → Claude Code로 진짜 기능 추가
+```
+
+이 길로 가면 **"노코드 → 풀 코드"** 로 자연스럽게 넘어갑니다. Lovable에서 막히던 부분도 Claude Code에서는 직접 코드로 풀 수 있습니다.
+
+## 참고 자료
+
+- [Claude Code 공식 문서](https://docs.claude.com/en/docs/claude-code)
+- [Skills 가이드](https://docs.claude.com/en/docs/claude-code/skills)
+- [Hooks 가이드](https://docs.claude.com/en/docs/claude-code/hooks)
+- [Sub-agents 가이드](https://docs.claude.com/en/docs/claude-code/sub-agents)
+
+## 체크포인트 (선택)
+
+- [ ] Claude Code = 본인 컴퓨터에서 동작하는 Claude 라는 점 이해
+- [ ] **하네스 엔지니어링** = 환경을 미리 잡아두는 기술 — 한 줄 정리 가능
+- [ ] CLAUDE.md / Skills / Hooks / Agents — 4개 단어 들어 봄
+- [ ] 라이브 데모 흐름(Read → Edit → Write)이 어떻게 보이는지 머릿속에 그림 그려짐
+- [ ] 흥미가 생긴 사람: 강의 끝난 후 `claude` 설치 + "5분 첫 도전" 미션 시도
+
+## 다음 단계
+
+[Day 2 숙제](/day2/homework)로 오늘을 마무리합니다.

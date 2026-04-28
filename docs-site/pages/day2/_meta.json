@@ -1,8 +1,12 @@
 {
   "index": "Day 2 개요",
+  "idea-check": "아이디어 점검 — 4일 안에 만들 수 있나?",
   "prd": "PRD 사고법",
   "concept": "내 앱 컨셉 정의서",
   "lovable-first-screen": "Lovable로 첫 화면 만들기",
+  "lovable-iterate": "Lovable 반복 개선 — 풀 흐름",
   "polish": "화면 다듬기",
+  "github": "GitHub 빠른 이해",
+  "claude-code": "(심화) Claude Code 사용법",
   "homework": "Day 2 숙제"
 }
