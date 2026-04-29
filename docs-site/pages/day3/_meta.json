@@ -1,9 +1,11 @@
 {
   "index": "Day 3 개요",
+  "decompose": "내 앱을 3등분 해보기",
   "concepts": "프론트·백엔드·DB 개념",
-  "supabase-setup": "Supabase 프로젝트 만들기",
+  "lovable-cloud": "Lovable Cloud로 백엔드 켜기",
   "auth": "회원가입·로그인 붙이기",
   "crud": "데이터 저장하고 불러오기",
-  "deploy": "Vercel로 배포하기",
+  "deploy": "Lovable로 배포하기",
+  "advanced-supabase-vercel": "(번외) 직접 Supabase·Vercel 운영하기",
   "homework": "Day 3 숙제"
 }
