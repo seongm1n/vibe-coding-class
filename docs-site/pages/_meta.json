@@ -9,5 +9,11 @@
     "theme": {
       "breadcrumb": false
     }
+  },
+  "extra-firebase": {
+    "title": "(번외) Supabase vs Firebase",
+    "theme": {
+      "breadcrumb": false
+    }
   }
 }
