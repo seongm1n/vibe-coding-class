@@ -10,6 +10,12 @@
       "breadcrumb": false
     }
   },
+  "paid-tools": {
+    "title": "(번외) 어떤 도구를 결제할까",
+    "theme": {
+      "breadcrumb": false
+    }
+  },
   "extra-firebase": {
     "title": "(번외) Supabase vs Firebase",
     "theme": {
