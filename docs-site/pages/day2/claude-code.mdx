@@ -50,14 +50,21 @@ Day 5+: Claude Code로 본격적인 코드 작업
 
 ## 설치하기 (5분)
 
+### 0) 사전 요구사항 — Node.js
+
+Claude Code는 Node.js 기반 CLI입니다. 먼저 [nodejs.org](https://nodejs.org)에서 LTS 버전을 설치하세요. 설치 확인:
+
+```bash
+node --version
+```
+
+`v20.x` 이상이면 됩니다.
+
 ### 1) Claude Code 설치
 
 ```bash
-# macOS / Linux
-curl -fsSL https://claude.ai/install.sh | sh
-
-# Windows
-winget install anthropic.claude-code
+# macOS / Linux / Windows 공통 (npm)
+npm install -g @anthropic-ai/claude-code
 ```
 
 설치 후 터미널에서 다음을 쳐서 버전이 뜨면 성공.

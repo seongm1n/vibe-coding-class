@@ -17,7 +17,7 @@ AI로 노래(BGM)와 음성을 만들어 봅니다. 본인 앱 홍보용 BGM 한
 | 도구 | 용도 | 무료 한도 |
 | --- | --- | --- |
 | [Suno](https://suno.com) | 가사 + 장르를 입력하면 노래 1곡 생성 | 일 10크레딧 (대략 노래 5곡 분량) |
-| [ElevenLabs](https://elevenlabs.io) | 텍스트를 사람 목소리로 합성, 한국어 가능 | 월 1만 글자 정도 무료 |
+| [ElevenLabs](https://elevenlabs.io) | 텍스트를 사람 목소리로 합성, 한국어 가능 | 월 10,000 크레딧 (한국어 기준 약 10분 분량) |
 
 <Callout type="info">
 **Suno는 진짜 가수가 부른 것처럼 노래를 만들어 줍니다.** 처음 들어 보면 다들 한 번씩 놀라는 결과물이 나옵니다.
@@ -44,7 +44,7 @@ ElevenLabs는 가입 시 **이메일 인증 메일**이 옵니다. 메일이 늦
 
 ChatGPT (또는 Claude) 탭에 다음을 붙여 넣으세요.
 
-```text filename="📋 앱 BGM 가사 생성 — 라이브"
+```text filename="앱 BGM 가사 생성 — 라이브"
 나는 [본인 앱 이름] 이라는 앱의 짧은 홍보 BGM을 만들고 싶어.
 [본인 앱이 뭘 해 주는지 한 줄] 한국어 가사로 30초 분량 써 줘.
 
@@ -140,7 +140,7 @@ Suno가 보통 **2곡을 동시에** 만들어 줍니다. 같은 가사·같은 
 
 다음 스크립트를 그대로 붙여 넣거나 본인 앱에 맞춰 수정하세요.
 
-```text filename="📋 ElevenLabs 안내 음성 스크립트"
+```text filename="ElevenLabs 안내 음성 스크립트"
 안녕하세요, [본인 앱 이름]입니다.
 오늘도 [짧은 인사 — 운동/식사/공부 등 앱 컨셉에 맞게].
 아래 [버튼/입력창]을 눌러 시작해 주세요.
@@ -151,7 +151,7 @@ Suno가 보통 **2곡을 동시에** 만들어 줍니다. 같은 가사·같은 
 
 1. **"Generate"** 또는 ▶️ 버튼 클릭
 2. 5~10초 대기 → 음성이 자동 재생됨
-3. 발음이 어색한 부분 있으면 **띄어쓰기**나 **한자어**를 살짝 수정 → 다시 Generate
+3. 발음이 어색한 부분이 있으면 **띄어쓰기**나 **한자어**를 살짝 수정 → 다시 Generate
 
 #### 다운로드
 
@@ -185,11 +185,11 @@ Suno가 보통 **2곡을 동시에** 만들어 줍니다. 같은 가사·같은 
 
 #### 나쁜 예
 
-```text filename="❌ 나쁜 예 (Style 입력)"
+```text filename="나쁜 예 (Style 입력)"
 신나는 노래
 ```
 
-```text filename="❌ 나쁜 예 (Lyrics)"
+```text filename="나쁜 예 (Lyrics)"
 앱 좋다
 ```
 
@@ -197,11 +197,11 @@ Suno가 보통 **2곡을 동시에** 만들어 줍니다. 같은 가사·같은 
 
 #### 보통 예
 
-```text filename="🟡 보통 예 (Style)"
+```text filename="보통 예 (Style)"
 밝고 경쾌한 K-pop
 ```
 
-```text filename="🟡 보통 예 (Lyrics)"
+```text filename="보통 예 (Lyrics)"
 FitCheck으로 매일매일 출석 체크
 운동을 시작해 보자 함께
 ```
@@ -210,11 +210,11 @@ FitCheck으로 매일매일 출석 체크
 
 #### 좋은 예
 
-```text filename="✅ 좋은 예 (Style)"
+```text filename="좋은 예 (Style)"
 upbeat K-pop, female vocal, electric guitar, energetic, 110 bpm, modern, motivational
 ```
 
-```text filename="✅ 좋은 예 (Lyrics)"
+```text filename="좋은 예 (Lyrics)"
 [Verse]
 오늘도 헬스장 가는 길
 머뭇거리던 내가 달라졌어
@@ -268,7 +268,7 @@ FitCheck FitCheck
 
 #### 나쁜 예
 
-```text filename="❌ 나쁜 예"
+```text filename="나쁜 예"
 앱 안녕
 ```
 
@@ -276,7 +276,7 @@ FitCheck FitCheck
 
 #### 보통 예
 
-```text filename="🟡 보통 예"
+```text filename="보통 예"
 안녕하세요, FitCheck입니다. 출석을 체크해주세요.
 ```
 
@@ -284,7 +284,7 @@ FitCheck FitCheck
 
 #### 좋은 예
 
-```text filename="✅ 좋은 예"
+```text filename="좋은 예"
 안녕하세요, FitCheck입니다. 오늘도 운동하러 와주셔서 감사합니다. 아래 버튼을 눌러 출석을 체크해주세요. 같이 건강해져요.
 ```
 
@@ -318,7 +318,7 @@ ElevenLabs는 다양한 목소리를 고를 수 있습니다.
 </Callout>
 
 <Callout type="warning">
-**ElevenLabs 월 1만 글자**는 짧은 안내 음성 100개 분량입니다. 강의 기간에는 충분합니다.
+**ElevenLabs 무료 한도(월 10,000 크레딧)**는 한국어 기준 약 10분 분량의 음성입니다. 강의 안내 음성 1~2개를 만드는 데는 충분합니다. (정확한 크레딧 차감은 음성·옵션에 따라 다르니 가입 후 대시보드에서 잔여량을 확인하세요.)
 </Callout>
 
 ## 한도 떨어졌을 때 백업

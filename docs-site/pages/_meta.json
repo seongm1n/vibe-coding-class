@@ -21,5 +21,11 @@
     "theme": {
       "breadcrumb": false
     }
+  },
+  "closing": {
+    "title": "마치며",
+    "theme": {
+      "breadcrumb": false
+    }
   }
 }

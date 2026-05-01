@@ -6,6 +6,6 @@
   "auth": "회원가입·로그인 붙이기",
   "crud": "데이터 저장하고 불러오기",
   "deploy": "Lovable로 배포하기",
-  "advanced-supabase-vercel": "(번외) 직접 Supabase·Vercel 운영하기",
-  "homework": "Day 3 숙제"
+  "homework": "Day 3 숙제",
+  "advanced-supabase-vercel": "(번외) 직접 Supabase·Vercel 운영하기"
 }
